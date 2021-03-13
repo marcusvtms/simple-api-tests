@@ -9,6 +9,12 @@ API_URL = 'https://1e8aa271-e499-4226-8f49-2d7927b42e33.mock.pstmn.io'
 def step_impl(context):
     context.order_id = '8ccdb422-b259-42f6-8bf4-8829381d7ed4'
 
+@given('the request body is set with one item')
+def step_impl(context):
+    with open('./utils/order1.json') as f:
+        data = json.load(f)
+        context.data = data
+
 @step('the HEADER param request content type is "application/json"')
 def step_impl(context):
     context.header = {"Content-type" : "application/json"}
@@ -17,6 +23,13 @@ def step_impl(context):
 def step_impl(context):
     url = API_URL+'/order/'+context.order_id
     response = requests.get(url=url, headers=context.header)
+    context.response_body = response.json()
+    context.status_code = response.status_code
+
+@when('the user sends a POST HTTP request to /order enpoint')
+def step_impl(context):
+    url = API_URL+'/order'
+    response = requests.post(url=url, headers=context.header, json=context.data)
     context.response_body = response.json()
     context.status_code = response.status_code
 
